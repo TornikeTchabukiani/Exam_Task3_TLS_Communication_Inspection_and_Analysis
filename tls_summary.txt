@@ -1,0 +1,83 @@
+
+TLS Inspection and Analysis Report
+----------------------------------
+
+1. TLS Handshake Explanation
+----------------------------
+The TLS handshake is a multi-step process that establishes a secure communication
+channel between the client (browser) and the server (website). The main steps are:
+
+1. **Client Hello**
+   - The client initiates the handshake, sending the list of supported TLS versions,
+     cipher suites, and random data used to generate keys.
+
+2. **Server Hello**
+   - The server responds by selecting a TLS version and cipher suite from the list,
+     and includes its own random data.
+
+3. **Certificate Exchange**
+   - The server sends its digital certificate, which includes its public key.
+     The client uses the certificate to verify the server’s authenticity.
+
+4. **Key Exchange**
+   - Both sides derive a shared session key using methods such as ECDHE
+     (Elliptic Curve Diffie-Hellman Ephemeral), ensuring forward secrecy.
+
+5. **Handshake Verification**
+   - Both client and server send “Finished” messages encrypted with the new session key,
+     confirming that the handshake was not altered.
+
+6. **Secure Communication**
+   - All subsequent data is encrypted and authenticated using symmetric encryption.
+
+In Wireshark, the handshake can be seen in packets labeled:
+   - “Client Hello”
+   - “Server Hello”
+   - “Certificate”
+   - “Encrypted Handshake Message”
+
+
+2. Man-in-the-Middle (MITM) Protection
+--------------------------------------
+TLS protects against MITM attacks through several mechanisms:
+
+- **Certificate Authentication:**  
+  The client verifies the server’s certificate chain against trusted Certificate Authorities (CAs).
+  An attacker cannot forge a valid certificate without access to the CA’s private key.
+
+- **Public Key Cryptography:**  
+  The server’s private key is never transmitted. Even if a MITM intercepts the data,
+  they cannot decrypt or impersonate the server without that private key.
+
+- **Integrity Verification:**  
+  Each message in the handshake and data transfer is verified using message authentication codes (MACs),
+  ensuring no tampering occurs in transit.
+
+- **Session Key Security:**  
+  Session keys are generated per connection and discarded afterward.
+  Even if one session is compromised, others remain secure.
+
+
+3. TLS in HTTPS Communication
+-----------------------------
+When accessing a website via HTTPS (e.g., https://www.google.com), the browser and server use TLS
+to ensure three main security properties:
+
+- **Encryption:**  
+  All communication between client and server is encrypted, preventing eavesdropping.
+
+- **Authentication:**  
+  The certificate system confirms the identity of the website.  
+  The browser will warn users if the certificate is invalid or self-signed.
+
+- **Integrity:**  
+  Any modification of the transmitted data will be detected and rejected.
+
+Example session details:
+   - Protocol: TLSv1.3
+   - Cipher: TLS_AES_256_GCM_SHA384
+   - Key Exchange: ECDHE (provides Perfect Forward Secrecy)
+   - Authentication: RSA-2048
+   - Certificate Issuer: Google Trust Services LLC
+
+Thus, HTTPS with TLS provides a secure, authenticated, and confidential connection between users and websites.
